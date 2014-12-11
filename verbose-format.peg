@@ -1,0 +1,52 @@
+/*
+ * Classic example grammar, which recognizes simple arithmetic expressions like
+ * "2*(3+4)". The parser generated from this grammar then computes their value.
+ */
+
+
+{
+  function str(arr) { return arr.join(''); }
+}
+
+start =
+  method? atom
+
+method =
+  methodstr:("method " [^\n]+ "\n")
+  {
+    return methodstr[0] + str(methodstr[1]);
+  }
+
+atom =
+  crap:((" "/"\n")*)
+  useful:(
+    string /
+    array /
+    struct)
+  crap2:((" "/"\n")*)
+  {
+    return useful;
+  }
+
+struct =
+  crap:"struct {\n"
+  useful:atom*
+  crap2:"}"
+  {
+    return useful;
+  }
+
+array =
+  crap:"array [\n"
+  array:atom*
+  crap2:"]"
+  {
+    return array;
+  }
+
+string =
+  crap:"string " string:[^\n]+ "\n"
+  {
+    return JSON.parse(str(string))
+  }
+
